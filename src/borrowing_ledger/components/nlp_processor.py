@@ -1,11 +1,11 @@
-# src/borrowing_ledger/components/nlp_processor.py
 from intent_classifer import IntentClassifier
 import re
 from indic_transliteration import sanscript
 from indic_transliteration.sanscript import transliterate
 
 class ExpandedNLPProcessor:
-    def __init__(self):
+    def __init__(self, input_text=""):
+        self.input_text = input_text 
         self.amount_pattern = r'\d+'
         self.name_pattern = r'\b[A-Za-z]+\b'
         self.item_keywords = ['ke', 'ka', 'ki']
@@ -14,8 +14,15 @@ class ExpandedNLPProcessor:
             'show_balance': ['dikha', 'show', 'batao'],
             'delete_entry': ['mita', 'delete', 'hata'],
             'calculation': ['calculate', 'gin'],
-            'subtraction': ['minus', 'ghata', 'kam']
+            'subtraction': ['minus', 'ghata', 'kam'],
+            'actions': ['mail', 'email', 'e-mail', 'send', 'bhej', 'forward', 'share', 'transfer','whatsapp']
         }
+
+    def set_input_text(self, input_text):
+        self.input_text = input_text
+
+    def get_input_text(self):
+        return self.input_text
 
     def process_text(self, text):
         # Transliterate the text to Latin script
@@ -32,10 +39,6 @@ class ExpandedNLPProcessor:
             'name': self._extract_name(latin_text),
             'item': self._extract_item(latin_text)
         }
-
-        # Additional processing based on intent
-        if intent == 'calculation' or intent == 'subtraction':
-            result['operands'] = self._extract_operands(latin_text)
 
         return result
 
@@ -63,60 +66,30 @@ class ExpandedNLPProcessor:
                 return intent
         return 'unknown'
 
-    def _extract_operands(self, text):
-        numbers = re.findall(self.amount_pattern, text)
-        return [int(num) for num in numbers]
-
-
-
+   
 
 # Usage example
 if __name__ == "__main__":
 
-    input_text = "15 rupaye likho geeta ke liye"
-    classifier = IntentClassifier()
-  # Assuming this is the file where we defined the IntentClassifier class
-    model_path="C:\Users\anupam kumar\Downloads\borrow-assistant\src\borrowing_ledger\components\intent_classifier_model.joblib"
+    input_text = "15 rupaye kaat do geeta ke liye"
+
+    processor = ExpandedNLPProcessor(input_text)
+    input = processor.get_input_text()
+    print(f"Input from processor: {input}")
+    processed_info = processor.process_text(input_text)
+    print(processed_info)
+
+    # Assuming this is the file where we defined the IntentClassifier class
+    model_path = r"C:\Users\anupam kumar\Downloads\borrow-assistant\src\borrowing_ledger\components\intent_classifier_model.joblib"
+    
     def predict_intent(input_text, model_path):
-    # Load the saved model
         classifier = IntentClassifier()
         classifier.load_model(model_path)
         
         # Predict the intent
         intent = classifier.predict_intent(input_text)
+        print(f"Predicted Intent: {intent}")
         return intent
-    
-    model_path = 'intent_classification_pipeline.joblib'  # Path to your saved model
-    
-    # Test phrases
-    test_phrases = [
-        "subham ka total kitna hai",
-        "meena ke 40 rupee kaat do",
-        "Hata do 30 rupaye wali entry",
-        "40 rupee likh do mina ke",
-        "aau ke 30 rupee jama kar do",
-        "bhvaesh ke 20 rupee likh do"
-    ]
-    
-    # Predict intents for test phrases
-    for phrase in test_phrases:
-        predicted_intent = predict_intent(phrase, model_path)
-        print(f"Phrase: {phrase}")
-        print(f"Predicted Intent: {predicted_intent}\n")
-    
-    # Interactive prediction
-    while True:
-        user_input = input("Enter a phrase (or 'quit' to exit): ")
-        if user_input.lower() == 'quit':
-            break
-        predicted_intent = predict_intent(user_input, model_path)
-        print(f"Predicted Intent: {predicted_intent}\n")
 
-
-
-processor = ExpandedNLPProcessor()
-
-
-
-
-        
+    intent = predict_intent(input_text, model_path)
+    print(f"Predicted Intent: {intent}")

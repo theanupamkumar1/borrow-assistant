@@ -1,0 +1,10 @@
+graph TD
+    A[Hindi Voice Input] -->|Speech Recognition| B[Hindi Text]
+    B -->|Transliteration| C[Roman Script]
+    C -->|NLP Processing| D[Tokenization]
+    D --> E[Named Entity Recognition]
+    E --> F[Intent Classification]
+    F --> G[Parameter Extraction]
+    G --> H[Query Template Selection]
+    H --> I[Query Generation]
+    I --> J[SQL Query]

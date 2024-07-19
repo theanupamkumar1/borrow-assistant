@@ -94,7 +94,7 @@ class IntentClassifier:
 # Example usage
 if __name__ == "__main__":
    
-    
+    classifier = IntentClassifier()
     # Train the model
     classifier.train(r"C:\Users\anupam kumar\Downloads\borrow-assistant\artifacts\intent-classifier_data.csv")
 
@@ -108,7 +108,9 @@ if __name__ == "__main__":
         "Hata do 30 rupaye wali entry",
         "40 rupee likh do mina ke",
         "aau ke 30 rupee jama kar do",
-        "bhvaesh ke 20 rupee likh do"
+        "bhvaesh ke 20 rupee likh do",
+        "shubham ko total mail ka do",
+        "Kavita ka hisaab kitab email karo"
     ]
 
     # Test the classifier on the phrases
