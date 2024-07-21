@@ -1,6 +1,5 @@
-from nlp_processor import ExpandedNLPProcessor
-
-from intent_classifer import IntentClassifier
+from src.borrowing_ledger.components.nlp_processor import ExpandedNLPProcessor
+# from src.borrowing_ledger.components.intent_classifer import IntentClassifier
 
 from typing import Dict, Any
 from datetime import datetime
@@ -141,7 +140,8 @@ if __name__ == "__main__":
     
 
     processor = ExpandedNLPProcessor()
-    input_text = processor.get_input_text()
+
+    input_text = "15 rupaye jama do shubham ke liye"
     processed_info = processor.process_text(input_text)
     print(processed_info)
     intent = processed_info['intent']
