@@ -1,8 +1,10 @@
 # src/borrowing_ledger/components/nlp_processor.py
 from src.borrowing_ledger.components.intent_classifer import IntentClassifier
+# from intent_classifer import IntentClassifier
 import re
 from indic_transliteration import sanscript
 from indic_transliteration.sanscript import transliterate
+
 
 class ExpandedNLPProcessor:
     def __init__(self):
@@ -42,7 +44,7 @@ class ExpandedNLPProcessor:
     def _extract_amount(self, text):
         matches = re.findall(self.amount_pattern, text)
         return int(matches[0]) if matches else None
-
+    
     def _extract_name(self, text):
         words = text.split()
         for i, word in enumerate(words):
@@ -76,7 +78,9 @@ if __name__ == "__main__":
     input_text = "15 rupaye likho geeta ke liye"
     classifier = IntentClassifier()
   # Assuming this is the file where we defined the IntentClassifier class
+    
     model_path=r"C:\Users\anupam kumar\Downloads\borrow-assistant\src\borrowing_ledger\components\intent_classifier_model.joblib"
+    # model_path = r'intent_classification_pipeline.joblib'
     def predict_intent(input_text, model_path):
     # Load the saved model
         classifier = IntentClassifier()
@@ -86,7 +90,8 @@ if __name__ == "__main__":
         intent = classifier.predict_intent(input_text)
         return intent
     
-    model_path = r'intent_classification_pipeline.joblib'  # Path to your saved model
+    # model_path = r'intent_classification_pipeline.joblib'  # Path to your saved model
+    model_path=r"C:\Users\anupam kumar\Downloads\borrow-assistant\src\borrowing_ledger\components\intent_classifier_model.joblib"
     
     # Test phrases
     test_phrases = [
@@ -95,7 +100,9 @@ if __name__ == "__main__":
         "Hata do 30 rupaye wali entry",
         "40 rupee likh do mina ke",
         "aau ke 30 rupee jama kar do",
-        "bhvaesh ke 20 rupee likh do"
+        "bhvaesh ke 20 rupee likh do",
+        
+
     ]
     
     # Predict intents for test phrases
@@ -105,12 +112,12 @@ if __name__ == "__main__":
         print(f"Predicted Intent: {predicted_intent}\n")
     
     # Interactive prediction
-    while True:
-        user_input = input("Enter a phrase (or 'quit' to exit): ")
-        if user_input.lower() == 'quit':
-            break
-        predicted_intent = predict_intent(user_input, model_path)
-        print(f"Predicted Intent: {predicted_intent}\n")
+    # while True:
+    #     user_input = input("Enter a phrase (or 'quit' to exit): ")
+    #     if user_input.lower() == 'quit':
+    #         break
+    #     predicted_intent = predict_intent(user_input, model_path)
+    #     print(f"Predicted Intent: {predicted_intent}\n")
 
 
 

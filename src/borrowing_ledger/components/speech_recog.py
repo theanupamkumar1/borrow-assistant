@@ -4,8 +4,6 @@ import wave
 import os
 from typing import Optional
 import numpy as np
-from pydub import AudioSegment
-from pydub.playback import play
 
 class SpeechRecognizer:
     def __init__(self, language: str = "en-IN", wake_word: str = "chhotu"):
@@ -28,10 +26,10 @@ class SpeechRecognizer:
             bool: True if wake word detected, False otherwise.
         """
         print(f"Listening for wake word: '{self.wake_word}'...")
-        
+
         with sr.Microphone() as source:
             self.recognizer.adjust_for_ambient_noise(source)
-            
+
             while True:
                 try:
                     audio = self.recognizer.listen(source, timeout=1, phrase_time_limit=1)
@@ -44,17 +42,18 @@ class SpeechRecognizer:
                 except sr.WaitTimeoutError:
                     continue
                 except sr.UnknownValueError:
+                    print("Could not understand audio, continuing to listen...")
                     continue
-                except sr.RequestError:
-                    print("Could not request results from Google Speech Recognition service")
+                except sr.RequestError as e:
+                    print(f"Could not request results; {e}")
                     return False
 
     def play_activation_sound(self):
         """
         Play a short sound to indicate wake word detection.
         """
-        frequency = 440  # Hz
-        duration = 0.2  # seconds
+        frequency = 840  # Hz
+        duration = 0.5  # seconds
         samples = np.arange(int(self.rate * duration)) / self.rate
         waveform = np.sin(2 * np.pi * frequency * samples)
         audio = np.int16(waveform * 32767)
@@ -70,7 +69,7 @@ class SpeechRecognizer:
         """
         stream = self.audio.open(format=self.format, channels=self.channels,
                                  rate=self.rate, input=True,
-                                 frames_per_buffer=self.chunk,input_device_index=1)
+                                 frames_per_buffer=self.chunk)
         
         print("Recording...")
         
@@ -136,14 +135,3 @@ class SpeechRecognizer:
             self.cleanup()
             return text
         return None
-
-# Example usage
-if __name__ == "__main__":
-    recognizer = SpeechRecognizer(language="en-IN", wake_word="chhotu")
-    while True:
-        transcribed_text = recognizer.recognize_speech()
-        if transcribed_text:
-            print(f"Final transcription: {transcribed_text}")
-            # Process the transcribed text here
-        else:
-            print("Speech recognition failed or was interrupted.")

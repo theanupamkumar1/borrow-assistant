@@ -1,25 +1,17 @@
 from pymongo import MongoClient
 from datetime import datetime
+import pyttsx3
 
 class MongoDBHandler:
     def __init__(self, connection_string):
         self.client = MongoClient(connection_string)
         self.db = self.client['borrowing_ledger']
-        self.root_users = self.db['root_users']
-        
-    def add_root_user(self, customer_name, alias=None):
-    # Check if the user already exists
-        if self.root_users.count_documents({"customer_name": customer_name}) == 0:
-            user = {
-                "customer_name": customer_name,
-                "alias": alias,
-                "created_at": datetime.utcnow()
-            }
-            return self.root_users.insert_one(user).inserted_id
-        else:
-            print(f"User {customer_name} already exists.")
-        return None
-    
+        self.tts_engine = pyttsx3.init()
+
+    def speak(self, message):
+        self.tts_engine.say(message)
+        self.tts_engine.runAndWait()
+
     def add_customer_entry(self, customer_name, date, items, amount, phrase, total):
         collection = self.db[customer_name]
         entry = {
@@ -30,11 +22,33 @@ class MongoDBHandler:
             "total": total,
             "created_at": datetime.utcnow()
         }
-        return collection.insert_one(entry).inserted_id
+        result = collection.insert_one(entry)
+        self.speak("Entry added successfully")
+        return result.inserted_id
     
     def get_customer_entries(self, customer_name):
         collection = self.db[customer_name]
         return list(collection.find())
+
+    def get_total_balance(self, customer_name):
+        collection = self.db[customer_name]
+        pipeline = [
+            {"$group": {"_id": None, "total_balance": {"$sum": "$amount"}}}
+        ]
+        result = list(collection.aggregate(pipeline))
+        total_balance = result[0]['total_balance'] if result else 0
+        self.speak(f"Total balance for {customer_name} is {total_balance}")
+        return total_balance
+
+    def delete_entry(self, customer_name, amount):
+        collection = self.db[customer_name]
+        result = collection.delete_one({"amount": amount})
+        if result.deleted_count > 0:
+            self.speak("Entry deleted successfully")
+            return True
+        else:
+            self.speak("Entry not found")
+            return False
 
 # Usage example:
 if __name__ == '__main__':
